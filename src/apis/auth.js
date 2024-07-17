@@ -13,7 +13,7 @@ export const signUp = async (data) => {
 export const login = async (data) => {
   let response;
   try {
-    response = await api.post("/user/login", data);
+    response = await api.post("/user/loginWithEmail", data);
   } catch (error) {
     return error.response;
   }
@@ -82,6 +82,38 @@ export const changePassword = async (data) => {
   let response;
   try {
     response = await api.post("/user/changePassword", data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  } catch (error) {
+    return error.response;
+  }
+  return response.data;
+};
+
+export const getSocialProfiles = async (data) => {
+  const authData = JSON.parse(localStorage.getItem("persist:auth"));
+  const token = JSON.parse(authData.auth).accessToken;
+  let response;
+  try {
+    response = await api.get("/user/getSocialProfiles", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  } catch (error) {
+    return error.response;
+  }
+  return response.data;
+};
+
+export const AddSocialPorfiles = async (data) => {
+  const authData = JSON.parse(localStorage.getItem("persist:auth"));
+  const token = JSON.parse(authData.auth).accessToken;
+  let response;
+  try {
+    response = await api.post("/user/addSocialProfiles", data, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

@@ -1,44 +1,72 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Footer from "../layout/components/Footer";
-import axios from "axios";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
+import { addUser } from "@/apis/admin/CommonApis";
 
 export default function AddTrainer() {
+  const MySwal = withReactContent(Swal);
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [gender, setGender] = useState("");
   const [password, setPassword] = useState("");
-  const [file, setFile] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("email", email);
-    formData.append("phone", phone);
-    formData.append("password", password);
-    formData.append("file", file);
-
-    console.log(name, email, phone, password, file);
-    const url = import.meta.env.VITE_BASE_URL + "/admin/add-trainer";
-    try {
-      const response = await axios.post(url, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+    if (password !== confirmPassword) {
+      MySwal.fire({
+        title: "Error!",
+        text: "Password and ConfirmPassword do not match.",
+        icon: "error",
+        confirmButtonText: "OK",
       });
-      if (response.status == 201) {
-        console.log("created");
+      return;
+    }
+
+    const data = {
+      name,
+      email,
+      phone,
+      gender,
+      password,
+      userType: "Trainer",
+    };
+
+    try {
+      const response = await addUser(data);
+
+      if (response.status === 201) {
+        MySwal.fire({
+          icon: "success",
+          title: "Success",
+          text: "Trainer added successfully!",
+          timer: 1500,
+          showConfirmButton: false,
+        });
         navigate("/admin/trainers");
-      } else {
-        console.log("not created");
+      } else if (response.status === 409) {
+        MySwal.fire({
+          title: "Error!",
+          text: response.data.message,
+          icon: "error",
+          confirmButtonText: "OK",
+        });
       }
     } catch (err) {
+      MySwal.fire({
+        icon: "error",
+        title: "Error",
+        text: "An error occurred!",
+      });
       console.warn(err);
     }
   };
+
   return (
     <div className="dashboard__main">
       <div className="dashboard__content bg-light-4">
@@ -83,7 +111,7 @@ export default function AddTrainer() {
                     <input
                       required
                       type="email"
-                      placeholder="Enter your email adress"
+                      placeholder="Enter your email address"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                     />
@@ -103,16 +131,21 @@ export default function AddTrainer() {
                     />
                   </div>
                   <div className="col-6">
-                    <label className="text-16 lh-2 fw-500 text-dark-1 mb-10">
-                      Image*
+                    <label className="text-16 lh-1 fw-500 text-dark-1 mb-10">
+                      Gender*
                     </label>
-
-                    <input
+                    <select
                       required
-                      type="file"
-                      placeholder="Image"
-                      onChange={(e) => setFile(e.target.files[0])}
-                    />
+                      value={gender}
+                      onChange={(e) => setGender(e.target.value)}
+                    >
+                      <option value="" disabled>
+                        Select Gender
+                      </option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                    </select>
                   </div>
                   <div className="col-6">
                     <label className="text-16 lh-1 fw-500 text-dark-1 mb-10">
@@ -125,6 +158,19 @@ export default function AddTrainer() {
                       placeholder="Enter your password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </div>
+                  <div className="col-6">
+                    <label className="text-16 lh-1 fw-500 text-dark-1 mb-10">
+                      Confirm Password*
+                    </label>
+
+                    <input
+                      required
+                      type="password"
+                      placeholder="Confirm your password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
                     />
                   </div>
                   <div className="col-auto row y-gap-20 justify-between pt-15 w-1/1">
@@ -144,17 +190,6 @@ export default function AddTrainer() {
                     </div>
                   </div>
                 </form>
-
-                {/* <div className="row y-gap-20 justify-between pt-15">
-                        <div className="col-auto">
-                            <button className="button -md -outline-purple-1 text-purple-1">
-                            Prev
-                            </button>
-                            <button className="button -md -outline-purple-1 text-purple-1">
-                            Prev
-                            </button>
-                        </div>
-                    </div> */}
               </div>
             </div>
           </div>

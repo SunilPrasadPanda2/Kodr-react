@@ -46,7 +46,7 @@ function SocialProfiles({ activeTab }) {
           payload[key] = socialProfiles[key];
         }
       });
-  
+
       const response = await AddSocialPorfiles(payload);
       if (response && response.statusCode === 200) {
         MySwal.fire({
@@ -69,7 +69,6 @@ function SocialProfiles({ activeTab }) {
       setLoading(false);
     }
   };
-  
 
   return (
     <div
@@ -138,7 +137,9 @@ function SocialProfiles({ activeTab }) {
                 className="spinner-border spinner-border-sm"
                 role="status"
                 aria-hidden="true"
-              >Saving Social Profiles...</span>
+              >
+                Saving Social Profiles...
+              </span>
             ) : (
               "Save Social Profile"
             )}

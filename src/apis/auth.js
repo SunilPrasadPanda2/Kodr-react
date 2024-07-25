@@ -21,30 +21,27 @@ export const login = async (data) => {
   return response.data;
 };
 
-export const logout = async (_id) => {
-  // const authData = JSON.parse(localStorage.getItem("persist:auth"));
-  // const token = JSON.parse(authData.auth).accessToken;
-  // console.log("access token",token);
+export const logout = async () => {
+  const authData = JSON.parse(localStorage.getItem("persist:auth"));
+  const token = JSON.parse(authData.auth).accessToken;
   let response;
   try {
     response = await api.post(
       "/user/logout",
-      { _id }
-      // {
-      //   headers: {
-      //     Authorization: `Bearer ${token}`,
-      //   },
-      // }
+      {}, // because this is a post method so we need to use this empty object for data
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
   } catch (error) {
-    console.log("error coming");
-    console.log("error ", error.response);
-    return error.response; // Adjust to return error response
+    return error.response;
   }
   return response.data;
 };
 
-export const userProfile = async (data) => {
+export const userProfile = async () => {
   const authData = JSON.parse(localStorage.getItem("persist:auth"));
   const token = JSON.parse(authData.auth).accessToken;
   let response;

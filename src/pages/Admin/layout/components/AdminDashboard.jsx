@@ -268,7 +268,7 @@ export default function AdminDashboard() {
                                   href={elm.href}
                                   className="d-flex items-center text-17 lh-1 fw-500"
                                 >
-                                  <i className={elm.iconClass}></i>
+                                  <i className={`${elm.iconClass} me-3`}></i>
                                   {elm.text}
                                 </a>
                               )}

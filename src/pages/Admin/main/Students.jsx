@@ -1,21 +1,42 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import Footer from "../layout/components/Footer";
 import { Link } from "react-router-dom";
-import { banners as fetchBanners } from "@/apis/admin/BannersApi";
+import { students } from "@/apis/admin/StudentsApi";
+import { accessToken } from "@/store/authSlice";
+import { useSelector } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserPen, faTrash, faEye } from "@fortawesome/free-solid-svg-icons";
+import { viewUser } from "@/apis/admin/CommonApis";
 
-export default function Banners() {
-  const [banners, setBanners] = useState([]);
+export default function Student() {
+  const token = useSelector(accessToken);
+  const [studentData, setStudentData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const result = await fetchBanners();
-      setBanners(result.data.banners);
+    const fetchStudents = async () => {
+      try {
+        const response = await students();
+        if (response.statusCode === 200) {
+          setStudentData(response.data.trainers);
+        } else {
+          log;
+          return <div>Problem while loading students</div>;
+        }
+      } catch (error) {
+        console.error(
+          error.message || "An error occurred while fetching students"
+        );
+      } finally {
+        setLoading(false);
+      }
     };
-    fetchData();
-  }, []);
 
+    fetchStudents();
+  }, []);
+  if (loading) {
+    return <div>Loading...</div>;
+  }
   return (
     <div className="dashboard__main">
       <div
@@ -24,15 +45,15 @@ export default function Banners() {
       >
         <div className="row pb-20 mb-10">
           <div className="col-6">
-            <h1 className="text-30 lh-12 fw-700">Banners</h1>
+            <h1 className="text-30 lh-12 fw-700">Students</h1>
           </div>
           <div className="col-6 d-flex justify-content-end">
             <div className="eventCard__button">
               <Link
-                to="/admin/add-banner"
+                to="/admin/add-student"
                 className="button -sm -rounded -outline-purple-1 text-purple-1 px-25"
               >
-                Add Banner
+                Add Student
               </Link>
             </div>
           </div>
@@ -47,7 +68,7 @@ export default function Banners() {
                     className="text-light-1 lh-12 tabs__button"
                     type="button"
                   >
-                    All Banners
+                    All Students
                   </button>
                 </div>
 
@@ -57,27 +78,21 @@ export default function Banners() {
                       <thead>
                         <tr>
                           <th>Sl.no</th>
-                          <th>Banner Name</th>
-                          <th>Banner Image</th>
-                          <th>Offer</th>
+                          <th>Name</th>
+                          <th>Email</th>
+                          <th>Phone</th>
                           <th>Operations</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {banners.map((banner, index) => (
-                          <tr key={index}>
+                        {studentData.map((student, index) => (
+                          <tr key={student._id}>
                             <td>{index + 1}</td>
-                            <td>{banner.name}</td>
+                            <td>{student.name}</td>
+                            <td>{student.email}</td>
+                            <td>{student.phone}</td>
                             <td>
-                              <img
-                                src={banner.bannerImage}
-                                alt={banner.name}
-                                style={{ width: "100px", height: "auto" }}
-                              />
-                            </td>
-                            <td>{banner.offer} %</td>
-                            <td>
-                              <Link to={`${banner._id}`}>
+                              <Link to={`${student._id}`}>
                                 <FontAwesomeIcon
                                   icon={faUserPen}
                                   style={{
@@ -87,7 +102,7 @@ export default function Banners() {
                                   }}
                                 />
                               </Link>
-                              <Link to={`${banner._id}`}>
+                              <Link to={`${student._id}`}>
                                 <FontAwesomeIcon
                                   icon={faTrash}
                                   style={{ fontSize: "20px" }}

@@ -21,18 +21,28 @@ export default function SignUpForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (password !== confirmPassword) {
+      MySwal.fire({
+        title: "Error!",
+        text: "Password and ConfirmPassword do not match.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+      return;
+    }
+
     const data = {
       name,
       email,
       phone,
       password,
-      confirmPassword,
       userType,
       gender,
     };
-    const response = await signUp(data);
-    console.log(response);
+
     try {
+      const response = await signUp(data);
+      console.log(response);
       if (response.statusCode === 201) {
         MySwal.fire({
           title: "Success!",
@@ -42,16 +52,7 @@ export default function SignUpForm() {
         }).then(() => {
           navigate("/login");
         });
-      }
-      if (response.status === 403) {
-        MySwal.fire({
-          title: "Error!",
-          text: response.data.message,
-          icon: "error",
-          confirmButtonText: "OK",
-        });
-      }
-      if (response.status === 409) {
+      } else if (response.status === 409) {
         MySwal.fire({
           title: "Error!",
           text: response.data.message,
